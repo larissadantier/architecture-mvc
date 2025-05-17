@@ -37,9 +37,9 @@ class UsersControllers {
 	) {
 		const { body } = req;
 
-		const verifyEmail = await UsersModels.emailExists(req.server, body.email);
+		const verifyEmailExists = await UsersModels.emailExists(req.server, body.email);
 
-		if (verifyEmail) {
+		if (verifyEmailExists) {
 			reply.code(409).send({
 				code: "EMAIL_ALREADY_EXISTS",
 				message:
