@@ -20,12 +20,25 @@ class UsersModels {
 		fastify: FastifyInstance,
 		payload: { first_name: string; last_name: string; email: string },
 	) {
-		const result = await fastify.pg.query(
+		const { rows } = await fastify.pg.query(
 			"INSERT INTO users (first_name, last_name, email) VALUES($1, $2, $3) RETURNING id, first_name, last_name, email",
 			[payload.first_name, payload.last_name, payload.email],
 		);
 
-		return result.rows[0];
+		return rows[0];
+	}
+
+	async update(
+		fastify: FastifyInstance,
+		id: number,
+		payload: { first_name: string; last_name: string; email: string },
+	) {
+		const { rows } = await fastify.pg.query(
+			"UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4 RETURNING *",
+			[payload.first_name, payload.last_name, payload.email, id],
+		);
+
+		return rows[0];
 	}
 
 	async emailExists(fastify: FastifyInstance, email: string) {
