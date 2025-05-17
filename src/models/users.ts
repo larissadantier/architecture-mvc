@@ -27,6 +27,15 @@ class UsersModels {
 
 		return result.rows[0];
 	}
+
+	async emailExists(fastify: FastifyInstance, email: string) {
+		const { rowCount } = await fastify.pg.query(
+			"SELECT email FROM users WHERE email = $1 LIMIT 1",
+			[email],
+		);
+
+		return (rowCount ?? 0) > 0;
+	}
 }
 
 export default new UsersModels();

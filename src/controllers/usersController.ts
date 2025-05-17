@@ -18,7 +18,7 @@ class UsersControllers {
 		if (!params.id) {
 			reply.code(400).send({
 				code: "USER_ID_REQUIRED",
-				message: "O campo 'id' do usuário é obrigatório.",
+				message: "The field 'id' of user is required.",
 			});
 
 			return;
@@ -36,6 +36,18 @@ class UsersControllers {
 		reply: FastifyReply,
 	) {
 		const { body } = req;
+
+		const verifyEmail = await UsersModels.emailExists(req.server, body.email);
+
+		if (verifyEmail) {
+			reply.code(409).send({
+				code: "EMAIL_ALREADY_EXISTS",
+				message:
+					"The e-mail you entered is already registered. Try using a different one.",
+			});
+
+			return;
+		}
 
 		const result = await UsersModels.create(req.server, body);
 
