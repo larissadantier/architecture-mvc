@@ -6,7 +6,7 @@ class UsersControllers {
 	async index(req: FastifyRequest, reply: FastifyReply) {
 		const users = await UsersModels.findAll(req.server);
 
-		reply.code(200).send(users);
+		reply.code(200).send({ data: users });
 	}
 
 	async show(
@@ -17,16 +17,25 @@ class UsersControllers {
 
 		if (!params.id) {
 			reply.code(400).send({
-				code: "USER_ID_REQUIRED",
-				message: "The param'id' of user is required.",
+				code: "USER_ID_PARAM_REQUIRED",
+				message: "The param 'id' of user is required.",
 			});
 
 			return;
 		}
 
-		const result = await UsersModels.findById(req.server, Number(params.id));
+		const user = await UsersModels.findById(req.server, Number(params.id));
 
-		reply.code(200).send(result);
+		if (!user) {
+			reply.code(400).send({
+				code: "USER_NOT_FOUND",
+				message: "No user exists with the given ID.",
+			});
+
+			return;
+		}
+
+		reply.code(200).send(user);
 	}
 
 	async store(
@@ -77,7 +86,7 @@ class UsersControllers {
 
 		if (!params.id) {
 			reply.code(400).send({
-				code: "USER_ID_REQUIRED",
+				code: "USER_ID_PARAM_REQUIRED",
 				message: "The param 'id' of user is required.",
 			});
 
@@ -92,8 +101,10 @@ class UsersControllers {
 		if (!userExists) {
 			reply.code(400).send({
 				code: "USER_NOT_FOUND",
-				message: "Usuário não encontrado.",
+				message: "No user exists with the given ID.",
 			});
+
+			return;
 		}
 
 		if (!body.first_name || !body.last_name || !body.email) {
@@ -125,8 +136,38 @@ class UsersControllers {
 		reply.code(200).send(result);
 	}
 
-	async destroy(req: FastifyRequest, reply: FastifyReply) {
-		reply.code(200).send({ ok: true });
+	async destroy(
+		req: FastifyRequest<{ Params: { id: number } }>,
+		reply: FastifyReply,
+	) {
+		const { params } = req;
+
+		if (!params.id) {
+			reply.code(400).send({
+				code: "USER_ID_PARAM_REQUIRED",
+				message: "The param 'id' of user is required.",
+			});
+
+			return;
+		}
+
+		const userExists = await UsersModels.findById(
+			req.server,
+			Number(params.id),
+		);
+
+		if (!userExists) {
+			reply.code(400).send({
+				code: "USER_NOT_FOUND",
+				message: "No user exists with the given ID.",
+			});
+
+			return;
+		}
+
+		await UsersModels.delete(req.server, params.id);
+
+		reply.code(204).send({ success: true });
 	}
 }
 

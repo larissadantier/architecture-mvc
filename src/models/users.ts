@@ -41,6 +41,10 @@ class UsersModels {
 		return rows[0];
 	}
 
+	async delete(fastify: FastifyInstance, id: number) {
+		await fastify.pg.query("DELETE FROM users WHERE id = $1", [id]);
+	}
+
 	async emailExists(fastify: FastifyInstance, email: string) {
 		const { rowCount } = await fastify.pg.query(
 			"SELECT email FROM users WHERE email = $1 LIMIT 1",
