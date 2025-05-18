@@ -34,7 +34,7 @@ class UsersModels {
 		payload: { first_name: string; last_name: string; email: string },
 	) {
 		const { rows } = await fastify.pg.query(
-			"UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4 RETURNING *",
+			"UPDATE users SET first_name = $1, last_name = $2, email = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *",
 			[payload.first_name, payload.last_name, payload.email, id],
 		);
 
