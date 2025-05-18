@@ -7,8 +7,6 @@ export const fastify = Fastify({
 	logger: true,
 });
 
-console.log(process.env.DEV_DATABASE_URL);
-
 fastify.register(fastifyPostgres, {
 	connectionString: process.env.DEV_DATABASE_URL,
 });
