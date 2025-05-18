@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 
 class UsersModels {
 	async findAll(fastify: FastifyInstance) {
-		const { rows } = await fastify.pg.query("SELECT * FROM users");
+		const { rows } = await fastify.pg.query("SELECT * FROM users ORDER BY id");
 
 		return rows;
 	}

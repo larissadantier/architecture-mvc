@@ -18,7 +18,7 @@ class UsersControllers {
 		if (!params.id) {
 			reply.code(400).send({
 				code: "USER_ID_REQUIRED",
-				message: "The field 'id' of user is required.",
+				message: "The param'id' of user is required.",
 			});
 
 			return;
@@ -37,7 +37,19 @@ class UsersControllers {
 	) {
 		const { body } = req;
 
-		const verifyEmailExists = await UsersModels.emailExists(req.server, body.email);
+		if (!body.first_name || !body.last_name || !body.email) {
+			reply.code(400).send({
+				code: "REQUIRED_FIELDS_MISSING",
+				message: "Some required fields are missing or invalid.",
+			});
+
+			return;
+		}
+
+		const verifyEmailExists = await UsersModels.emailExists(
+			req.server,
+			body.email,
+		);
 
 		if (verifyEmailExists) {
 			reply.code(409).send({
@@ -54,8 +66,63 @@ class UsersControllers {
 		reply.code(201).send(result);
 	}
 
-	async update(req: FastifyRequest, reply: FastifyReply) {
-		reply.code(200).send({ ok: true });
+	async update(
+		req: FastifyRequest<{
+			Params: { id: number };
+			Body: { first_name: string; last_name: string; email: string };
+		}>,
+		reply: FastifyReply,
+	) {
+		const { params, body } = req;
+
+		if (!params.id) {
+			reply.code(400).send({
+				code: "USER_ID_REQUIRED",
+				message: "The param 'id' of user is required.",
+			});
+
+			return;
+		}
+
+		const userExists = await UsersModels.findById(
+			req.server,
+			Number(params.id),
+		);
+
+		if (!userExists) {
+			reply.code(400).send({
+				code: "USER_NOT_FOUND",
+				message: "Usuário não encontrado.",
+			});
+		}
+
+		if (!body.first_name || !body.last_name || !body.email) {
+			reply.code(400).send({
+				code: "REQUIRED_FIELDS_MISSING",
+				message: "Some required fields are missing or invalid.",
+			});
+
+			return;
+		}
+
+		const verifyEmailExists = await UsersModels.emailExists(
+			req.server,
+			body.email,
+		);
+
+		if (verifyEmailExists) {
+			reply.code(409).send({
+				code: "EMAIL_ALREADY_EXISTS",
+				message:
+					"The e-mail you entered is already registered. Try using a different one.",
+			});
+
+			return;
+		}
+
+		const result = await UsersModels.update(req.server, params.id, body);
+
+		reply.code(200).send(result);
 	}
 
 	async destroy(req: FastifyRequest, reply: FastifyReply) {
