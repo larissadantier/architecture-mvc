@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync } from "fastify";
-import { usersRoutes } from "./usersRoutes";
+import { userRoute } from "./userRoute";
 
 export const privateRoutes: FastifyPluginAsync = async (fastify) => {
-	fastify.register(usersRoutes, { prefix: "/users" });
+	fastify.register(userRoute, { prefix: "/users" });
 };

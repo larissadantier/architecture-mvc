@@ -1,10 +1,10 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-import UsersModels from "../models/users";
+import UserModel from "../models/user";
 
-class UsersControllers {
+class UserController {
 	async index(req: FastifyRequest, reply: FastifyReply) {
-		const users = await UsersModels.findAll(req.server);
+		const users = await UserModel.findAll(req.server);
 
 		reply.code(200).send({ data: users });
 	}
@@ -24,7 +24,7 @@ class UsersControllers {
 			return;
 		}
 
-		const user = await UsersModels.findById(req.server, Number(params.id));
+		const user = await UserModel.findById(req.server, Number(params.id));
 
 		if (!user) {
 			reply.code(400).send({
@@ -55,7 +55,7 @@ class UsersControllers {
 			return;
 		}
 
-		const verifyEmailExists = await UsersModels.emailExists(
+		const verifyEmailExists = await UserModel.emailExists(
 			req.server,
 			body.email,
 		);
@@ -70,7 +70,7 @@ class UsersControllers {
 			return;
 		}
 
-		const result = await UsersModels.create(req.server, body);
+		const result = await UserModel.create(req.server, body);
 
 		reply.code(201).send(result);
 	}
@@ -93,10 +93,7 @@ class UsersControllers {
 			return;
 		}
 
-		const userExists = await UsersModels.findById(
-			req.server,
-			Number(params.id),
-		);
+		const userExists = await UserModel.findById(req.server, Number(params.id));
 
 		if (!userExists) {
 			reply.code(400).send({
@@ -116,7 +113,7 @@ class UsersControllers {
 			return;
 		}
 
-		const verifyEmailExists = await UsersModels.emailExists(
+		const verifyEmailExists = await UserModel.emailExists(
 			req.server,
 			body.email,
 		);
@@ -131,7 +128,7 @@ class UsersControllers {
 			return;
 		}
 
-		const result = await UsersModels.update(req.server, params.id, body);
+		const result = await UserModel.update(req.server, params.id, body);
 
 		reply.code(200).send(result);
 	}
@@ -151,10 +148,7 @@ class UsersControllers {
 			return;
 		}
 
-		const userExists = await UsersModels.findById(
-			req.server,
-			Number(params.id),
-		);
+		const userExists = await UserModel.findById(req.server, Number(params.id));
 
 		if (!userExists) {
 			reply.code(400).send({
@@ -165,10 +159,10 @@ class UsersControllers {
 			return;
 		}
 
-		await UsersModels.delete(req.server, params.id);
+		await UserModel.delete(req.server, params.id);
 
 		reply.code(204).send({ success: true });
 	}
 }
 
-export default new UsersControllers();
+export default new UserController();

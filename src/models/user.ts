@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 
-class UsersModels {
+class UserModel {
 	async findAll(fastify: FastifyInstance) {
 		const { rows } = await fastify.pg.query("SELECT * FROM users ORDER BY id");
 
@@ -55,4 +55,4 @@ class UsersModels {
 	}
 }
 
-export default new UsersModels();
+export default new UserModel();
